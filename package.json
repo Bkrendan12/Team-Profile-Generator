@@ -1,0 +1,23 @@
+{
+  "name": "team-profile-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose ./_tests_/* " 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bkrendan12/Team-Profile-Generator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bkrendan12/Team-Profile-Generator/issues"
+  },
+  "homepage": "https://github.com/Bkrendan12/Team-Profile-Generator#readme",
+  "dependencies": {
+    "inquirer": "^8.0.0",
+    "jest": "^26.6.3"
+  }
+}
