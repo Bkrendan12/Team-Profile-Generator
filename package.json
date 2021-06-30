@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose ./_tests_/* " 
+    "test": "jest --verbose ./_tests_/* "
+ 
   },
   "repository": {
     "type": "git",

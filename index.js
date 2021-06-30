@@ -9,22 +9,22 @@ const managerQuestionArr = [
   {
     type: "input",
     message: "What is the employee's name?",
-    name: "name",
+    name: "ManagerName",
   },
   {
     type: "input",
     message: "What is the employee's ID number?",
-    name: "id",
+    name: "ManagerId",
   },
   {
     type: "input",
     message: "What is the employee's email?",
-    name: "email",
+    name: "ManagerEmail",
   },
   {
     type: "input",
     message: "What is the employee's office number?",
-    name: "officeNumber",
+    name: "ManagerOfficeNumber",
   },
 ];
 
@@ -32,22 +32,22 @@ const engineerQuestionsArr = [
   {
     type: "input",
     message: "What is the employee's name?",
-    name: "name",
+    name: "EngineerName",
   },
   {
     type: "input",
     message: "What is the employee's ID number?",
-    name: "id",
+    name: "EngineerId",
   },
   {
     type: "input",
     message: "What is the employee's email?",
-    name: "email",
+    name: "EngineerEmail",
   },
   {
     type: "input",
     message: "What is the employee's github?",
-    name: "githubUsername",
+    name: "EngineerGithubUsername",
   },
 ];
 
@@ -55,22 +55,30 @@ const internQuestionsArr = [
   {
     type: "input",
     message: "What is the employee's name?",
-    name: "name",
+    name: "InternName",
   },
   {
     type: "input",
     message: "What is the employee's ID number?",
-    name: "id",
+    name: "InternId",
   },
   {
     type: "input",
     message: "What is the employee's email?",
-    name: "email",
+    name: "InternEmail",
   },
   {
     type: "input",
     message: "What school did the employee Attend?",
-    name: "school",
+    name: "InternSchool",
+  },
+];
+
+const employeeAmountArr = [
+  {
+    type: "number",
+    message: "How many employees do you want?",
+    name: "employeeAmount",
   },
 ];
 
@@ -82,6 +90,7 @@ const classQuestionArr = [
     choices: ["Manager", "Engineer", "Intern"],
   },
 ];
+
 const classDictionary = {
   Manager: managerQuestionArr,
   Engineer: engineerQuestionsArr,
@@ -90,7 +99,8 @@ const classDictionary = {
 const outputArr = [];
 
 async function askQuestions() {
-  for (var i = 1; i <= 5; i++) {
+  let { employeeAmount } = await inquirer.prompt(employeeAmountArr);
+  for (var i = 1; i <= employeeAmount; i++) {
     let { clazz } = await inquirer.prompt(classQuestionArr);
     let answers = await inquirer.prompt(classDictionary[clazz]);
     outputArr.push({
@@ -98,163 +108,151 @@ async function askQuestions() {
       answers,
     });
   }
+  console.log(outputArr);
   buildHtml(outputArr);
 }
 
-function buildHtml(data) {
+function buildHtml(Data) {
+  let generateHtmlAll = ``; // build html !doc!
   for (var employeeData of Data) {
     var employee;
     switch (employeeData.clazz) {
       case "Manager":
-        let { name, id, email, officeNumber } = employeeData.answers;
-        employee = new Manager(name, id, email, officeNumber);
+        let { ManagerName, ManagerId, ManagerEmail, ManagerOfficeNumber } =
+          employeeData.answers;
+        employee = new Manager(
+          ManagerName,
+          ManagerId,
+          ManagerEmail,
+          ManagerOfficeNumber
+        );
         break;
       case "Engineer":
-        let { name, id, email, githubUsername } = employeeData.answers;
-        employee = new Engineer(name, id, email, githubUsername);
+        let {
+          EngineerName,
+          EngineerId,
+          EngineerEmail,
+          EngineerGithubUsername,
+        } = employeeData.answers;
+        employee = new Engineer(
+          EngineerName,
+          EngineerId,
+          EngineerEmail,
+          EngineerGithubUsername
+        );
         break;
 
       case "Intern":
-        let { name, id, email, officeNumber } = employeeData.answers;
-        employee = new Intern(name, id, email, school);
+        let { InternName, InternId, InternEmail, InternOfficeNumber } =
+          employeeData.answers;
+        employee = new Intern(
+          InternName,
+          InternId,
+          InternEmail,
+          InternOfficeNumber
+        );
         break;
     }
+    employeeData = employee;
+    let employeeCard = generateEmployeeCard(employee);
+    generateHtmlAll += employeeCard;
   }
+  fs.writeFileSync(
+    "./index.html",
+    `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>My Team</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./src/style.css" />
+    <script src="https://kit.fontawesome.com/c502137733.js"></script>
+  </head>
+
+  <body>
+  <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 jumbotron mb-3 team-heading">
+          <h1 class="text-center">My Team</h1>
+        </div>
+      </div>
+    </div>
+    ${generateHtmlAll}
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
+`
+  );
+  console.log(generateHtmlAll);
 }
 
 askQuestions();
 
-const appendData = (data) => {
-  fs.writeFile("./lib/index.html", (err, data) => {
-    if (err) {
-      console.log(err);
-    }
-  });
-};
+function generateEmployeeCard(employee) {
+  let employeeTypeInfo = "";
+  switch (employee.getRole()) {
+    case "Engineer":
+      employeeTypeInfo = "Github Username " + employee.getGithub();
+      break;
+    case "Manager":
+      employeeTypeInfo = "Office Number:" + employee.getOfficeNumber();
+      break;
+    case "Intern":
+      employeeTypeInfo = "School: " + employee.getSchool();
+      break;
+  }
 
-function appendHtml() {
-  return ` 
+  return `
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    <title>Team-Profile-Generator</title>
-  </head>
-  <body>
-    <h1>My Team!</h1>
-
-    <div class="card-deck">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">${this.name}</h5>
-          <h5 class="card-title">${role()}</h5>
-          <div class="col info">
-            <div class="row info-text">${this.id}</div>
-            <div class="row info-text">${this.email}</div>
-            <div class="row info-text">${this.officeNumber}</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">${this.name}</h5>
-          <h5 class="card-title">${this.role()}</h5>
-          <div class="col info">
-            <div class="row info-text">${this.id}</div>
-            <div class="row info-text">${this.email}</div>
-            <div class="row info-text">${this.github}</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">${this.name}</h5>
-          <h5 class="card-title">${this.role()}</h5>
-          <div class="col info">
-            <div class="row info-text">${this.id}</div>
-            <div class="row info-text">${this.email}</div>
-            <div class="row info-text">${this.github}</div>
+    <div class="container">
+      <div class="row">
+        <div class="team-area col-12 d-flex justify-content-center">
+          <div class="card employee-card">
+            <div class="card-header">
+              <h2 class="card-title">${employee.getName()}</h2>
+              <h3 class="card-title">
+                <i class="fas fa-glasses mr-2"></i>${employee.getRole()}
+              </h3>
+            </div>
+            <div class="card-body">
+              <ul class="list-group">
+                <li class="list-group-item">ID:${employee.getId()}</li>
+                <li class="list-group-item">
+                  Email:
+                  ${employee.getEmail()}
+                </li>
+                <li class="list-group-item">
+                  
+                
+                  ${employeeTypeInfo}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="card-deck">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">${this.name}</h5>
-          <h5 class="card-title">${this.role()}</h5>
-          <div class="col info">
-            <div class="row info-text">${this.id}</div>
-            <div class="row info-text">${this.email}</div>
-            <div class="row info-text">${this.github}</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">${this.name}</h5>
-          <h5 class="card-title">${this.role()}</h5>
-          <div class="col info">
-            <div class="row info-text">${this.id}</div>
-            <div class="row info-text">${this.email}</div>
-            <div class="row info-text">${this.school}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script
-        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
-</html>
 
 `;
 }
-
-// function writeToFile(fileName, this) {
-//   fs.writeFileSync(fileName, generateMarkdown(data));
-// } // I want to say we dont need this since we only have one index.js file so we arent using any other .js files
-
-function init() {
-  inquirer.prompt(managerQuestionArr).then(function (data) {
-    writeToFile("index.html", data);
-  });
-}
-
-function init() {
-  inquirer.prompt(engineerOneQuestionsArr).then(function (data) {
-    writeToFile("index.html", data);
-  });
-}
-
-function init() {
-  inquirer.prompt(engineerTwoQuestionsArr).then(function (data) {
-    writeToFile("index.html", data);
-  });
-}
-
-function init() {
-  inquirer.prompt(engineerThreeQuestionsArr).then(function (data) {
-    writeToFile("index.html", data);
-  });
-}
-
-function init() {
-  inquirer.prompt(internQuestionsArr).then(function (data) {
-    writeToFile("index.html", data);
-  });
-}
-
-appendData();
